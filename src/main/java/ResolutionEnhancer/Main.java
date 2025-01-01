@@ -10,10 +10,10 @@ import java.util.List;
 public class Main {
     static String traindata = "/home/marcin/IdeaProjects/AI from scratch/src/main/java/ResolutionEnhancer/data/train.csv";
     static String testData = "/home/marcin/IdeaProjects/AI from scratch/src/main/java/ResolutionEnhancer/data/train.csv";
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         List<MatrixData> data = CsvSplitter.splitData(traindata);
         NeuralNetwork neuralNetwork = new NeuralNetwork();
-        neuralNetwork.train(data,1000);
+        neuralNetwork.train(data,10000);
         neuralNetwork.saveToFile("/home/marcin/IdeaProjects/AI from scratch/src/main/java/trainedModel/trainedModel.csv");
 
 

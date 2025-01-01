@@ -1,8 +1,10 @@
 package ResolutionEnhancer;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public  class Neuron {
+public  class Neuron implements Serializable{
+    private static final long serialVersionUID = 1L;
     public double[] weights;
     public double[] bestWeights;
     public double bias;

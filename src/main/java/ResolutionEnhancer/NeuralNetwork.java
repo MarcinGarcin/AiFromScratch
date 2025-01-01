@@ -4,7 +4,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeuralNetwork {
+public class NeuralNetwork implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final int INPUT_SIZE = 12;
     private static final int OUTPUT_SIZE = 27;

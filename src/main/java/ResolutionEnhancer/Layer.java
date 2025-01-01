@@ -1,9 +1,11 @@
 package ResolutionEnhancer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public  class Layer {
+public class Layer implements Serializable {
+    private static final long serialVersionUID = 1L;
     public List<Neuron> neurons;
     private double[] activations;
 
