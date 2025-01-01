@@ -2,50 +2,44 @@ package ResolutionEnhancer;
 
 import java.util.Random;
 
-public class Neuron {
+public  class Neuron {
     public double[] weights;
     public double[] bestWeights;
     public double bias;
     public double bestBias;
-    private static final double MUTATION_RATE = 0.2;
-    private static final double MUTATION_RANGE = 0.01;
+    private double mutationRate = 0.2;
+    private static final double INITIAL_WEIGHT_RANGE = 0.1;
     private final Random random = new Random();
 
     public Neuron(int inputSize) {
         weights = new double[inputSize];
         bestWeights = new double[inputSize];
 
+        double scale = Math.sqrt(2.0 / (inputSize + 1));
+
         for (int i = 0; i < inputSize; i++) {
-            weights[i] = (random.nextDouble() * 2 - 1) * 0.1;
+            weights[i] = random.nextGaussian() * scale;
             bestWeights[i] = weights[i];
         }
 
-        bias = (random.nextDouble() * 2 - 1) * 0.1;
+        bias = random.nextGaussian() * scale;
         bestBias = bias;
-    }
-
-    public double compute(double[] inputs) {
-        if (inputs.length != weights.length) {
-            throw new IllegalArgumentException("Input size doesn't match weights size");
-        }
-
-        double sum = bias;
-        for (int i = 0; i < inputs.length; i++) {
-            sum += inputs[i] * weights[i];
-        }
-        return Utility.leakyRelu(sum);
     }
 
     public void mutate() {
         for (int i = 0; i < weights.length; i++) {
-            if (random.nextDouble() < MUTATION_RATE) {
-                weights[i] += (random.nextDouble() * 2 - 1) * MUTATION_RANGE;
+            if (random.nextDouble() < mutationRate) {
+                weights[i] += random.nextGaussian() * INITIAL_WEIGHT_RANGE;
             }
         }
 
-        if (random.nextDouble() < MUTATION_RATE) {
-            bias += (random.nextDouble() * 2 - 1) * MUTATION_RANGE;
+        if (random.nextDouble() < mutationRate) {
+            bias += random.nextGaussian() * INITIAL_WEIGHT_RANGE;
         }
+    }
+
+    public void adjustMutationRate(double factor) {
+        mutationRate = Math.min(0.5, Math.max(0.01, mutationRate * factor));
     }
 
     public void remember() {

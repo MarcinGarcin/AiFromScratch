@@ -13,9 +13,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         List<MatrixData> data = CsvSplitter.splitData(traindata);
         NeuralNetwork neuralNetwork = new NeuralNetwork();
-        neuralNetwork.train(data,10000);
-        data = CsvSplitter.splitData(testData);
-        neuralNetwork.test(data);
+        neuralNetwork.train(data,1000);
+        neuralNetwork.saveToFile("/home/marcin/IdeaProjects/AI from scratch/src/main/java/trainedModel/trainedModel.csv");
 
 
 

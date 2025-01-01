@@ -1,27 +1,31 @@
 package ResolutionEnhancer;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NeuralNetwork {
+
     private static final int INPUT_SIZE = 12;
-    private static final int SECOND_SIZE = 17;
-    private static final int THIRD_SIZE = 22;
     private static final int OUTPUT_SIZE = 27;
+    private static final int HIDDEN_SIZE = 32;
 
     private final List<Layer> layers;
     private double bestFitness = Double.MIN_VALUE;
 
     public NeuralNetwork() {
         layers = new ArrayList<>();
-        layers.add(new Layer(INPUT_SIZE, SECOND_SIZE));
-        layers.add(new Layer(SECOND_SIZE, THIRD_SIZE));
-        layers.add(new Layer(THIRD_SIZE, OUTPUT_SIZE));
+
+        layers.add(new Layer(INPUT_SIZE, HIDDEN_SIZE));
+        layers.add(new Layer(HIDDEN_SIZE, HIDDEN_SIZE));
+        layers.add(new Layer(HIDDEN_SIZE, OUTPUT_SIZE));
     }
+
+
 
     public double[] predict(double[] input) {
         if (input.length != INPUT_SIZE) {
-            throw new IllegalArgumentException("Input size must be " + INPUT_SIZE);
+            throw new IllegalArgumentException("Input size must be " + INPUT_SIZE + " (2x2 RGB image)");
         }
 
         double[] normalized = normalizeInput(input);
@@ -35,6 +39,9 @@ public class NeuralNetwork {
     }
 
     public void train(List<MatrixData> trainingData, int generations) {
+        double prevFitness = Double.MIN_VALUE;
+        int stagnantGenerations = 0;
+
         for (int gen = 0; gen < generations; gen++) {
             mutateLayers();
 
@@ -44,50 +51,40 @@ public class NeuralNetwork {
             if (fitness > bestFitness) {
                 bestFitness = fitness;
                 rememberLayers();
+                stagnantGenerations = 0;
             } else {
                 forgetLayers();
+                stagnantGenerations++;
             }
-        }
-    }
 
-    public void test(List<MatrixData> testData) {
-        double fitness = calculateFitness(testData);
-
-        System.out.println("\nTesting Results:");
-        System.out.println("Overall Fitness: " + String.format("%.4f", fitness));
-        System.out.println("Best Fitness Achieved: " + String.format("%.4f", bestFitness));
-
-        int correct = 0;
-        for (MatrixData sample : testData) {
-            double[] prediction = predict(sample.input);
-            double mse = meanSquaredError(prediction, sample.output);
-
-            if (mse < 0.01) {
-                correct++;
-            } else {
-                System.out.println("High MSE Sample: " + String.format("%.4f", mse));
+            if (stagnantGenerations > 10) {
+                adjustMutationRate(true);
+            } else if (fitness > prevFitness) {
+                adjustMutationRate(false);
             }
-        }
 
-        double accuracy = (double) correct / testData.size();
-        System.out.println("Correct Predictions: " + correct + "/" + testData.size());
-        System.out.println("Accuracy: " + String.format("%.2f%%", accuracy * 100));
+            prevFitness = fitness;
+        }
     }
 
     private double calculateFitness(List<MatrixData> data) {
-        int correct = 0;
-        int total = data.size();
-        double errorThreshold = 0.4;
-
+        double totalError = 0;
         for (MatrixData sample : data) {
             double[] prediction = predict(sample.input);
-            double[] difference = calculateDifference(prediction, sample.output);
-
-            if (isWithinError(difference, errorThreshold)) {
-                correct++;
-            }
+            totalError += calculateRGBError(prediction, sample.output);
         }
-        return (double) correct / total;
+        return 1.0 / (1.0 + totalError / data.size());
+    }
+
+    private double calculateRGBError(double[] predicted, double[] actual) {
+        double error = 0;
+        for (int i = 0; i < predicted.length; i += 3) {
+            double rError = Math.pow(predicted[i] - actual[i], 2);
+            double gError = Math.pow(predicted[i + 1] - actual[i + 1], 2);
+            double bError = Math.pow(predicted[i + 2] - actual[i + 2], 2);
+            error += (rError + gError + bError) / 3.0;
+        }
+        return error / (predicted.length / 3);
     }
 
     private double[] normalizeInput(double[] input) {
@@ -129,29 +126,26 @@ public class NeuralNetwork {
             }
         }
     }
-
-    private double[] calculateDifference(double[] arr1, double[] arr2) {
-        double[] difference = new double[arr1.length];
-        for (int i = 0; i < arr1.length; i++) {
-            difference[i] = Math.abs(arr1[i] - arr2[i]);
-        }
-        return difference;
-    }
-
-    private boolean isWithinError(double[] arr, double threshold) {
-        for (double val : arr) {
-            if (val > threshold) {
-                return false;
+    private void adjustMutationRate(boolean increase) {
+        double factor = increase ? 1.5 : 0.8;
+        for (Layer layer : layers) {
+            for (Neuron neuron : layer.neurons) {
+                neuron.adjustMutationRate(factor);
             }
         }
-        return true;
+    }
+    public void saveToFile(String filePath) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(this);
+            System.out.println("Neural network saved to: " + filePath);
+        }
     }
 
-    private double meanSquaredError(double[] arr1, double[] arr2) {
-        double sum = 0;
-        for (int i = 0; i < arr1.length; i++) {
-            sum += Math.pow(arr1[i] - arr2[i], 2);
+    public static NeuralNetwork loadFromFile(String filePath) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            NeuralNetwork network = (NeuralNetwork) ois.readObject();
+            System.out.println("Neural network loaded from: " + filePath);
+            return network;
         }
-        return sum / arr1.length;
     }
 }

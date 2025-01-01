@@ -19,4 +19,7 @@ public class Utility {
     public static double leakyRelu(double x) {
         return x > 0 ? x : 0.01 * x;
     }
+    public static double elu(double x) {
+        return x >= 0 ? x : 0.01 * (Math.exp(x) - 1);
+    }
 }
