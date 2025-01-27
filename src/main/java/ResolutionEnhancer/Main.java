@@ -1,29 +1,44 @@
 package ResolutionEnhancer;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class Main {
-    static String traindata = "/home/marcin/IdeaProjects/AI from scratch/src/main/java/ResolutionEnhancer/data/train.csv";
-    static String testData = "/home/marcin/IdeaProjects/AI from scratch/src/main/java/ResolutionEnhancer/data/train.csv";
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        List<MatrixData> data = CsvSplitter.splitData(traindata);
-        NeuralNetwork neuralNetwork = new NeuralNetwork();
-        neuralNetwork.train(data,10000);
-        neuralNetwork.saveToFile("/home/marcin/IdeaProjects/AI from scratch/src/main/java/trainedModel/trainedModel.csv");
+
+    private static final String RESOURCES_PATH = "src/main/java/ResolutionEnhancer";
+    private static final String trainData = RESOURCES_PATH + "/data/train.csv";
+    private static final String testData = RESOURCES_PATH + "/data/test.csv";
+    private static final String MODEL_PATH = "src/main/java/trainedModel/trainedModel.csv";
+
+    public static void main(String[] args) throws IOException {
+
+        String projectDir = System.getProperty("user.dir");
 
 
+        String trainDataPath = projectDir + File.separator + trainData.replace("/", File.separator);
+        String modelPath = projectDir + File.separator + MODEL_PATH.replace("/", File.separator);
 
-//        try {
-//            BufferedImage image = ImageIO.read(new File("/home/marcin/IdeaProjects/AI from scratch/src/main/java/ResolutionEnhancer/images/imagetest.jpg"));
-//            DataExtractor.extractData(image,"/home/marcin/IdeaProjects/AI from scratch/src/main/java/ResolutionEnhancer/data/test.csv");
-//
-//        }catch (IOException e){
+        //todo żeby wygenerować dane do nauczania należy najpierw odkomentować poniższy kod
+
+        //        try {
+//            String imagePath = projectDir + File.separator + RESOURCES_PATH +
+//                             File.separator + "images" + File.separator + "image1.jpg";
+//            BufferedImage image = ImageIO.read(new File(imagePath));
+//            DataExtractor.extractData(image, trainDataPath);
+//        } catch (IOException e) {
 //            System.out.println(e.getMessage());
-//        }
+//       }
+
+        List<MatrixData> data = CsvSplitter.splitData(trainDataPath);
+        NeuralNetwork neuralNetwork = new NeuralNetwork();
+        neuralNetwork.train(data, 10000);
+        neuralNetwork.saveToFile(modelPath);
+
+
+
+
+
     }
 }
