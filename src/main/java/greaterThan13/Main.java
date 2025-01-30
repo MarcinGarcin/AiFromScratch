@@ -5,7 +5,7 @@ public class Main {
         //AI for predicting if number is greater than 13
         NeuralNetwork network = new NeuralNetwork();
         NeuralNetwork.testNetwork(network);
-        network.train(1000000);
+        network.train(100000000);
         network.testNetwork(network);
 
     }

@@ -1,6 +1,8 @@
 package ResolutionEnhancer;
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -22,10 +24,12 @@ public class Main {
 
         //todo żeby wygenerować dane do nauczania należy najpierw odkomentować poniższy kod
 
-        //        try {
-//            String imagePath = projectDir + File.separator + RESOURCES_PATH +
-//                             File.separator + "images" + File.separator + "image1.jpg";
+//                try {
+//            String imagePath = projectDir + File.separator + RESOURCES_PATH +  File.separator + "images" + File.separator + "image1.jpg";
 //            BufferedImage image = ImageIO.read(new File(imagePath));
+//            DataExtractor.extractData(image, trainDataPath);
+//            imagePath = projectDir + File.separator + RESOURCES_PATH +  File.separator + "images" + File.separator + "image1.jpg";
+//            image = ImageIO.read(new File(imagePath));
 //            DataExtractor.extractData(image, trainDataPath);
 //        } catch (IOException e) {
 //            System.out.println(e.getMessage());
